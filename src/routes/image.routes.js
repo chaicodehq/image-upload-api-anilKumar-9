@@ -23,6 +23,28 @@ import { validateObjectId } from '../middlewares/validateObjectId.middleware.js'
 
 const router = Router();
 
-// Your routes here
+const handleUpload = (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      return next(err);
+      }
+    if (req.invalidFileType) {
+      return next(new Error('Invalid file type. Only JPEG, PNG, and GIF are allowed.'))
+    }
+
+    console.log(req.file);
+    console.log(req.body);
+    console.log(JSON.stringify(req.body, null, 2));
+
+    next();
+  });
+};
+
+router.post('/', handleUpload, uploadImage);
+router.get('/', listImages);
+router.get('/:id', validateObjectId, getImage);
+router.get('/:id/download', validateObjectId, downloadImage);
+router.get('/:id/thumbnail', validateObjectId, downloadThumbnail);
+router.delete('/:id', validateObjectId, deleteImage);
 
 export default router;
